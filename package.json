@@ -1,7 +1,12 @@
 {
   "name": "kpr-api",
   "version": "0.0.1",
-  "description": "",
+  "description": "Express middleware for implementing a KSP package repository according to the KPM communication spec.",
+  "keywords": [
+    "kpm",
+    "kerbal",
+    "repository"
+  ],
   "main": "index.js",
   "private": false,
   "repository": {
