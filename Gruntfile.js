@@ -12,6 +12,21 @@ module.exports = function(grunt) {
     
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        
+        bump: {
+            options: {
+                files: ['package.json'],
+                updateConfigs: ['pkg'],
+                commit: true,
+                commitMessage: 'release v%VERSION%',
+                commitFiles: ['package.json'],
+                createTag: true,
+                tagName: 'v%VERSION%',
+                tagMessage: 'Version v%VERSION%',
+                push: false
+            }
+        },
+        
         jshint: {
             all: {
                 src: ['index.js'],
@@ -26,6 +41,7 @@ module.exports = function(grunt) {
                 }
             }
         },
+        
         mochaTest: {
             options: {
                 reporter: 'spec'
@@ -39,4 +55,6 @@ module.exports = function(grunt) {
     grunt.registerTask('default', ['jshint', 'test']);
 
     grunt.registerTask('test', ['mochaTest']);
+    
+    grunt.registerTask('patch', ['bump:patch']);
 };
