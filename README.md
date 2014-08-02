@@ -32,7 +32,7 @@ app.use(kprApi({
 		callback(null); // package not found. 
     },
     
-    find: function(id, version, callback) {
+    exists: function(id, version, callback) {
         // code to determine whether specified package exists.
 		// return result (either true or false) to callback.
 		callback(false);
@@ -60,7 +60,7 @@ app.use(kprApi({
 - a `null` or `undefined` result means the package was not found and the server will respond with 404.
 - if the result is not a `stream` or `Buffer`, the middleware will pass an error to the next middleware.
 
-**find** (required) - a handler for determining if a package is available within the repository. Like **fetch**, it takes an `id`, `version`, and `callback`.
+**exists** (required) - a handler for determining if a package is available within the repository. Like **fetch**, it takes an `id`, `version`, and `callback`.
 
 - `version` may be blank. This means the latest version available.
 - `callback` expects either `true` or `false`.  

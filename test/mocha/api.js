@@ -339,7 +339,7 @@ describe('API:', function() {
         it('should respond 404 if package doesnt exist', function(done) {
             req.path += 'foo';
             req.method = 'HEAD';
-            options.find = function(id, version, callback) {
+            options.exists = function(id, version, callback) {
                 callback(false);
             };
             
@@ -354,7 +354,7 @@ describe('API:', function() {
         it('should respond 200 if package exists', function(done) {
             req.path += 'foo';
             req.method = 'HEAD';
-            options.find = function(id, version, callback) {
+            options.exists = function(id, version, callback) {
                 callback(true);
             };
             

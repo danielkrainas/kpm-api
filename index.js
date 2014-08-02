@@ -33,7 +33,7 @@ module.exports = exports = function(options) {
             
             var version = req.query.v || '';
             if (req.method == 'HEAD') {
-                options.find(id, version, function (exists) {
+                options.exists(id, version, function (exists) {
                     res.send(exists ? 200 : 404);
                 });
 
