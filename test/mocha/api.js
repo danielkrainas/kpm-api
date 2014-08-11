@@ -3,14 +3,14 @@ var sinon = require('sinon'),
        Readable = require('stream').Readable,
        util = require('util'),
        expect = chai.expect,
-       kprApi = require('../../index');
+       kpmApi = require('../../index');
 
 describe('API:', function() {
     var options, req, res, next;
     
     var kpmApiWrapper = function(options) {
         return function() {
-            kprApi(options);
+            kpmApi(options);
         };
     };
 
@@ -36,7 +36,7 @@ describe('API:', function() {
         });
         
         it('should return middleware', function() {
-            var ware = kprApi(options);
+            var ware = kpmApi(options);
             expect(ware).to.exist;
             expect(ware).to.be.a('function');
             expect(ware.length).to.equal(3);
@@ -44,7 +44,7 @@ describe('API:', function() {
         
         it('should passthrough if unrecognized path', function(done) {
             req.path = '/foo/';
-            kprApi(options)(req, res, function() {
+            kpmApi(options)(req, res, function() {
                 done();
             });
         });
@@ -122,7 +122,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should default page size to -1 when not specified', function(done) {
@@ -131,7 +131,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should return empty list when result is null', function(done) {
@@ -145,13 +145,13 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should passthrough if not a GET request', function(done) {
             req.method = 'PUT';
             
-            kprApi(options)(req, res, function() {
+            kpmApi(options)(req, res, function() {
                 done();
             });
         });
@@ -163,7 +163,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should recognize page size when specified', function(done) {
@@ -173,7 +173,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should support base path', function(done) {
@@ -183,7 +183,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
     });
     
@@ -214,7 +214,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should recognize id with hyphen', function(done) {
@@ -224,7 +224,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should recognize version', function(done) {
@@ -235,7 +235,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should default version to an empty string when not specified', function(done) {
@@ -245,7 +245,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should return 404 if id is null', function(done) {
@@ -254,7 +254,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should return 404 if result is null', function(done) {
@@ -268,7 +268,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should support base path', function(done) {
@@ -278,7 +278,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should allow buffer result', function(done) {
@@ -293,7 +293,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
 
         it('should allow stream result', function(done) {
@@ -308,7 +308,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
 
         it('should allow string result', function(done) {
@@ -323,7 +323,7 @@ describe('API:', function() {
                 done();
             };
 
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
 
         it('should return 302 when result is a string', function(done) {
@@ -338,7 +338,7 @@ describe('API:', function() {
                 done();
             };
 
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
 
         it('should return 200 when result is a stream', function(done) {
@@ -352,7 +352,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should pass error if result not recognized', function(done) {
@@ -361,7 +361,7 @@ describe('API:', function() {
                 callback([]);
             };
             
-            kprApi(options)(req, res, function(msg) {
+            kpmApi(options)(req, res, function(msg) {
                 expect(msg).not.be.null;
                 done();
             });
@@ -379,7 +379,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
         
         it('should respond 200 if package exists', function(done) {
@@ -394,7 +394,7 @@ describe('API:', function() {
                 done();
             };
             
-            kprApi(options)(req, res, next);
+            kpmApi(options)(req, res, next);
         });
     });
 });
