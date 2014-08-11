@@ -18,7 +18,6 @@ var express = require('express'),
 	app = express();
 
 app.use(kpmApi({
-    base:  '/api',
     list: function(page, size, callback) {
         // code to retrieve a list of available packages.
 		// pass result to callback when done.
@@ -41,10 +40,6 @@ app.use(kpmApi({
 ```
 
 ## Options
-
-**base** (optional) - The base path to install the API under.
- 
-- The default is root: `/`
 
 **list** (required) - A handler for listing available packages in the repository. Takes an index for the page requested(`page`), the page size(`size`), and a callback(`callback`) for returning the result. 
 

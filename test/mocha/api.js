@@ -175,16 +175,6 @@ describe('API:', function() {
             
             kpmApi(options)(req, res, next);
         });
-        
-        it('should support base path', function(done) {
-            options.base = '/foo';
-            req.path = options.base + req.path;
-            options.list = function(page, size) {
-                done();
-            };
-            
-            kpmApi(options)(req, res, next);
-        });
     });
     
     describe('Package Handler', function() {
@@ -194,7 +184,8 @@ describe('API:', function() {
         util.inherits(TestStream, Readable);
         beforeEach(function() {
             req = {
-                path: '/p/',
+                path: '/p/foo',
+                basePath: '/p/',
                 method: 'GET',
                 query: {}
             };
@@ -208,7 +199,6 @@ describe('API:', function() {
         });
         
         it('should recognize id', function(done) {
-            req.path += 'foo';
             options.fetch = function(id) {
                 expect(id).to.equal('foo');
                 done();
@@ -218,7 +208,7 @@ describe('API:', function() {
         });
         
         it('should recognize id with hyphen', function(done) {
-            req.path += 'foo-bar';
+            req.path = req.basePath + 'foo-bar';
             options.fetch = function(id) {
                 expect(id).to.equal('foo-bar');
                 done();
@@ -229,7 +219,6 @@ describe('API:', function() {
         
         it('should recognize version', function(done) {
             req.query.v = '1.0.0';
-            req.path += 'foo';
             options.fetch = function(id, version) {
                 expect(version).to.equal('1.0.0');
                 done();
@@ -239,7 +228,6 @@ describe('API:', function() {
         });
         
         it('should default version to an empty string when not specified', function(done) {
-            req.path += 'foo';
             options.fetch = function(id, version) {
                 expect(version).to.be.empty;
                 done();
@@ -249,6 +237,7 @@ describe('API:', function() {
         });
         
         it('should return 404 if id is null', function(done) {
+            req.path = req.basePath;
             res.send = function(status) {
                 expect(status).to.equal(404);
                 done();
@@ -258,7 +247,6 @@ describe('API:', function() {
         });
         
         it('should return 404 if result is null', function(done) {
-            req.path += 'foo';
             options.fetch = function(id, version, callback) {
                 callback(null);
             };
@@ -271,18 +259,7 @@ describe('API:', function() {
             kpmApi(options)(req, res, next);
         });
         
-        it('should support base path', function(done) {
-            options.base = '/foo';
-            req.path = '/foo/p/test';
-            options.fetch = function() {
-                done();
-            };
-            
-            kpmApi(options)(req, res, next);
-        });
-        
         it('should allow buffer result', function(done) {
-            req.path += 'foo';
             var buffer = new Buffer(0);
             options.fetch = function(id, version, callback) {
                 callback(buffer);
@@ -297,7 +274,6 @@ describe('API:', function() {
         });
 
         it('should allow stream result', function(done) {
-            req.path += 'foo';
             res.status = function() {};
             options.fetch = function(id, version, callback) {
                 callback(stream);
@@ -312,7 +288,6 @@ describe('API:', function() {
         });
 
         it('should allow string result', function(done) {
-            req.path += 'foo';
             var dest = 'http://tempuri.org/foo';
             options.fetch = function(id, version, callback) {
                 callback(dest);
@@ -327,7 +302,6 @@ describe('API:', function() {
         });
 
         it('should return 302 when result is a string', function(done) {
-            req.path += 'foo';
             var dest = 'http://tempuri.org/foo';
             options.fetch = function(id, version, callback) {
                 callback(dest);
@@ -342,7 +316,6 @@ describe('API:', function() {
         });
 
         it('should return 200 when result is a stream', function(done) {
-            req.path += 'foo';
             options.fetch = function(id, version, callback) {
                 callback(stream);
             };
@@ -356,7 +329,6 @@ describe('API:', function() {
         });
         
         it('should pass error if result not recognized', function(done) {
-            req.path += 'foo';
             options.fetch = function(id, version, callback) {
                 callback([]);
             };
@@ -368,7 +340,6 @@ describe('API:', function() {
         });
         
         it('should respond 404 if package doesnt exist', function(done) {
-            req.path += 'foo';
             req.method = 'HEAD';
             options.exists = function(id, version, callback) {
                 callback(false);
@@ -383,7 +354,6 @@ describe('API:', function() {
         });
         
         it('should respond 200 if package exists', function(done) {
-            req.path += 'foo';
             req.method = 'HEAD';
             options.exists = function(id, version, callback) {
                 callback(true);

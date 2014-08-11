@@ -1,12 +1,7 @@
-var stream = require('stream'),
-    urlJoin = require('url-join');
+var stream = require('stream');
 
 module.exports = exports = function (options) {
     var basePath = '/p';
-    if (options.base && options.base.length) {
-        basePath = urlJoin(options.base, basePath);
-    }
-
     var packagesPath = basePath + '/';
     if (!options.fetch || typeof options.fetch !== 'function') {
         throw new Error('fetch handler must be a function');
