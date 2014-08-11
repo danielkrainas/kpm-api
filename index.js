@@ -2,8 +2,12 @@ var stream = require('stream'),
     urlJoin = require('url-join');
 
 module.exports = exports = function (options) {
-    var basePath = options.base || '/';
-    var packagesPath = urlJoin(basePath, '/p/');
+    var basePath = '/p';
+    if (options.base && options.base.length) {
+        basePath = urlJoin(options.base, basePath);
+    }
+
+    var packagesPath = basePath + '/';
     if (!options.fetch || typeof options.fetch !== 'function') {
         throw new Error('fetch handler must be a function');
     } else if (!options.list || typeof options.list !== 'function') {
@@ -24,7 +28,6 @@ module.exports = exports = function (options) {
             } else {
                 next();
             }
-
         } else if (req.path.indexOf(packagesPath) === 0) {
             var id = req.path.substring(packagesPath.length);
             if (!id) {

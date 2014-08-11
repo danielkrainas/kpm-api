@@ -106,7 +106,7 @@ describe('API:', function() {
     describe('List Handler', function() {
         beforeEach(function() {
             req = {
-                path: '/',
+                path: '/p',
                 method: 'GET',
                 query: {}
             };
@@ -177,7 +177,8 @@ describe('API:', function() {
         });
         
         it('should support base path', function(done) {
-            req.path = options.base = '/foo';
+            options.base = '/foo';
+            req.path = options.base + req.path;
             options.list = function(page, size) {
                 done();
             };
