@@ -1,12 +1,12 @@
-# KPR-API
+# KPM-API
 
-KPR-API is an [ExpressJS][0] middleware for implementing the API required for a Kerbal Package Manager repository.
+KPM-API is an [ExpressJS][0] middleware for implementing the API required for a Kerbal Package Manager repository.
 
 ## Installation
 
 Install through `npm` like so:
 
-`npm install kpr-api --save`
+`npm install kpm-api --save`
 
 ## Usage
 
@@ -14,10 +14,10 @@ Install through `npm` like so:
 
 ```js
 var express = require('express'),
-	kprApi = require('kpr-api'),
+	kpmApi = require('kpm-api'),
 	app = express();
 
-app.use(kprApi({
+app.use(kpmApi({
     base:  '/api',
     list: function(page, size, callback) {
         // code to retrieve a list of available packages.
@@ -75,4 +75,4 @@ MIT License. Copyright 2014 Daniel Krainas [http://www.danielkrainas.com][1]
 
 [0]: http://expressjs.com/
 [1]: http://www.danielkrainas.com
-[2]: https://github.com/danielkrainas/kpr-api/issues
+[2]: https://github.com/danielkrainas/kpm-api/issues

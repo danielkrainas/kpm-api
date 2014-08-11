@@ -8,7 +8,7 @@ var sinon = require('sinon'),
 describe('API:', function() {
     var options, req, res, next;
     
-    var kprApiWrapper = function(options) {
+    var kpmApiWrapper = function(options) {
         return function() {
             kprApi(options);
         };
@@ -54,52 +54,52 @@ describe('API:', function() {
         it('should require list handler', function() {
             options.list = null;
 
-            expect(kprApiWrapper(options)).to.throw();
+            expect(kpmApiWrapper(options)).to.throw();
         });
         
         it('should require fetch handler', function() {
             options.fetch = null;
             
-            expect(kprApiWrapper(options)).to.throw();
+            expect(kpmApiWrapper(options)).to.throw();
         });
         
         it('should require exists handler', function() {
             options.exists = null;
             
-            expect(kprApiWrapper(options)).to.throw();
+            expect(kpmApiWrapper(options)).to.throw();
         });
         
         it('should require list to be a function', function() {
             options.list = 'list';
-            expect(kprApiWrapper(options)).to.throw();
+            expect(kpmApiWrapper(options)).to.throw();
             
             options.list = 1;
-            expect(kprApiWrapper(options)).to.throw();
+            expect(kpmApiWrapper(options)).to.throw();
             
             options.list = [1,2];
-            expect(kprApiWrapper(options)).to.throw();
+            expect(kpmApiWrapper(options)).to.throw();
         });
         
         it('should require fetch to be a function', function() {
             options.fetch = 'fetch';
-            expect(kprApiWrapper(options)).to.throw();
+            expect(kpmApiWrapper(options)).to.throw();
             
             options.fetch = 1;
-            expect(kprApiWrapper(options)).to.throw();
+            expect(kpmApiWrapper(options)).to.throw();
             
             options.fetch = [1,2];
-            expect(kprApiWrapper(options)).to.throw();
+            expect(kpmApiWrapper(options)).to.throw();
         });
         
         it('should require exists to be a function', function() {
             options.exists = 'exists';
-            expect(kprApiWrapper(options)).to.throw();
+            expect(kpmApiWrapper(options)).to.throw();
             
             options.exists = 1;
-            expect(kprApiWrapper(options)).to.throw();
+            expect(kpmApiWrapper(options)).to.throw();
             
             options.exists = [1,2];
-            expect(kprApiWrapper(options)).to.throw();
+            expect(kpmApiWrapper(options)).to.throw();
         });
     });
     

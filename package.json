@@ -1,5 +1,5 @@
 {
-  "name": "kpr-api",
+  "name": "kpm-api",
   "version": "0.1.0",
   "description": "Express middleware for implementing a KSP package repository according to the KPM communication spec.",
   "keywords": [
@@ -11,7 +11,7 @@
   "private": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/danielkrainas/kpr-api"
+    "url": "https://github.com/danielkrainas/kpm-api"
   },
   "author": {
     "name": "Daniel Krainas",
