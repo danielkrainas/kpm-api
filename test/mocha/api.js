@@ -310,6 +310,36 @@ describe('API:', function() {
             kprApi(options)(req, res, next);
         });
 
+        it('should allow string result', function(done) {
+            req.path += 'foo';
+            var dest = 'http://tempuri.org/foo';
+            options.fetch = function(id, version, callback) {
+                callback(dest);
+            };
+
+            res.redirect = function(status, location) {
+                expect(location).to.equal(dest);
+                done();
+            };
+
+            kprApi(options)(req, res, next);
+        });
+
+        it('should return 302 when result is a string', function(done) {
+            req.path += 'foo';
+            var dest = 'http://tempuri.org/foo';
+            options.fetch = function(id, version, callback) {
+                callback(dest);
+            };
+
+            res.redirect = function(status, location) {
+                expect(status).to.equal(302);
+                done();
+            };
+
+            kprApi(options)(req, res, next);
+        });
+
         it('should return 200 when result is a stream', function(done) {
             req.path += 'foo';
             options.fetch = function(id, version, callback) {
