@@ -8,7 +8,17 @@ Install through `npm` like so:
 
 `npm install kpm-api --save`
 
-## Package Usage
+## API Key Verification
+
+**Example:**
+
+```js
+kpmApi.verifyKey(function (key, callback) {
+    // verify key and pass the result to callback
+});
+```
+
+## Package API Usage
 
 **Example:**
 
@@ -18,20 +28,20 @@ var express = require('express'),
 	app = express();
 
 app.use(kpmApi.packages({
-    list: function(page, size, callback) {
+    list: function (page, size, client, callback) {
         // code to retrieve a list of available packages.
 		// pass result to callback when done.
 		callback([]);
     },
     
-    fetch: function(id, version, callback) {
+    fetch: function (pkg, client, callback) {
         // code to retrieve a stream or buffer for the
 		// specified package and version. pass result to
 		// callback when done.
 		callback(null); // package not found. 
     },
     
-    exists: function(id, version, callback) {
+    exists: function (pkg, client, callback) {
         // code to determine whether specified package exists.
 		// return result (either true or false) to callback.
 		callback(false);
@@ -45,15 +55,15 @@ app.use(kpmApi.packages({
 
 ```js
 app.use(kpmApi.owner({
-    add: function(client, name, callback) {
+    add: function(pkg, client, name, callback) {
         
     },
 
-    remove: function(client, name, callback) {
+    remove: function(pkg, client, name, callback) {
         
     },
 
-    list: function(client, callback) {
+    list: function(pkg, client, callback) {
         
     }
 }));
