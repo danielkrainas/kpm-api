@@ -1,19 +1,21 @@
-var sinon = require('sinon'),
-       chai = require('chai'),
-       Readable = require('stream').Readable,
-       util = require('util'),
-       expect = chai.expect,
-       kpmApi = require('../../index'),
-       ownerApi = kpmApi.owner;
+var chai = require('chai'),
+    expect = chai.expect,
+    ownerApi = require('../../index').owner;
 
 describe('Owner API:', function () {
     var options, req, res;
 
-    beforeEach(function() {
+    var apiWrapper = function(options) {
+        return function() {
+            ownerApi(options);
+        };
+    };
+
+    beforeEach(function () {
         options = {
-            add: function() {},
-            remove: function() {},
-            list: function() {}
+            add: function () { },
+            remove: function () { },
+            list: function () { }
         };
     });
 
@@ -22,6 +24,9 @@ describe('Owner API:', function () {
             req = {
                 path: '/',
                 method: 'GET',
+                get: function() {
+                    return null;
+                },
                 query: {}
             };
 
@@ -42,6 +47,81 @@ describe('Owner API:', function () {
             ownerApi(options)(req, res, function () {
                 done();
             });
+        });
+    });
+
+    describe('Options', function () {
+
+        it('should require add handler', function () {
+            options.add = null;
+
+            expect(apiWrapper(options)).to.throw();
+        });
+
+        it('should require remove handler', function() {
+            options.remove = null;
+
+            expect(apiWrapper(options)).to.throw();
+        });
+
+        it('should require list handler', function() {
+            options.list = null;
+
+            expect(apiWrapper(options)).to.throw();
+        });
+
+        it('should require add to be a function', function() {
+            options.add = 'add';
+            expect(apiWrapper(options)).to.throw();
+            
+            options.add = 1;
+            expect(apiWrapper(options)).to.throw();
+            
+            options.add = [1,2];
+            expect(apiWrapper(options)).to.throw();
+        });
+
+        it('should require remove to be a function', function() {
+            options.remove = 'remove';
+            expect(apiWrapper(options)).to.throw();
+            
+            options.remove = 1;
+            expect(apiWrapper(options)).to.throw();
+            
+            options.remove = [1,2];
+            expect(apiWrapper(options)).to.throw();
+        });
+
+        it('should require list to be a function', function() {
+            options.list = 'list';
+            expect(apiWrapper(options)).to.throw();
+            
+            options.list = 1;
+            expect(apiWrapper(options)).to.throw();
+            
+            options.list = [1,2];
+            expect(apiWrapper(options)).to.throw();
+        });
+    });
+
+    describe('List Handler:', function() {
+        beforeEach(function() {
+            req = {
+                path: '/o/',
+                method: 'GET',
+                get: function() {
+                    return null;
+                },
+                query: {}
+            };
+            
+            res = {
+                send: function() {}
+            };
+        });
+
+        it('should return empty list when result is null', function(done) {
+            done();
         });
     });
 });
