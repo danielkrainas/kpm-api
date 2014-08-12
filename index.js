@@ -1,20 +1,65 @@
 var stream = require('stream');
 
+var keyVerifier = null;
+
+var isFunction = function (fn) {
+    return (fn && typeof fn === 'function');
+};
+
+var Client = function (req) {
+    this.id = req.get('x-kpm-agent') || '';
+    this.version = req.get('x-kpm-version') || null;
+    this.key = req.get('x-kpm-key') || null;
+};
+
+var Package = function (id, version) {
+    $this = this;
+    this.id = id || null;
+    this.version = version || '';
+};
+
+Package.fromPath = function (path, start, hasVersion) {
+    var pkg = new Package();
+    path = path.substring(start);
+    var end = path.indexOf('/');
+    if (end <= 0) {
+        end = null;
+    }
+
+    pkg.id = path.substring(0, end);
+    if (end && hasVersion) {
+        pkg.version = path.substring(end + 1);
+    } else {
+        pkg.version = '';
+    }
+
+    return pkg;
+};
+
+Package.prototype.toString = function () {
+    return this.id + '@' + this.version;
+};
+
 module.exports = exports = {
 
+    Package: Package,
+
+    Client: Client,
+
     packages: function (options) {
-        var packageListPath = '/p';
+        var listPath = '/p';
         var packagesPath = '/p/';
-        if (!options.fetch || typeof options.fetch !== 'function') {
+        if (!isFunction(options.fetch)) {
             throw new Error('fetch handler must be a function');
-        } else if (!options.list || typeof options.list !== 'function') {
+        } else if (!isFunction(options.list)) {
             throw new Error('list handler must be a function');
-        } else if (!options.exists || typeof options.exists !== 'function') {
+        } else if (!isFunction(options.exists)) {
             throw new Error('exists handler must be a function');
         }
 
         return function (req, res, next) {
-            if (req.path == packageListPath) {
+            var client = new Client(req);
+            if (req.path == listPath) {
                 if (req.method == 'GET') {
                     var page = req.query.page || 0;
                     var size = req.query.size || -1;
@@ -26,19 +71,18 @@ module.exports = exports = {
                     next();
                 }
             } else if (req.path.indexOf(packagesPath) === 0) {
-                var id = req.path.substring(packagesPath.length);
-                if (!id) {
+                var pkg = Package.fromPath(req.path, packagesPath.length, true);
+                if (!pkg.id) {
                     res.send(404);
                 }
 
-                var version = req.query.v || '';
                 if (req.method == 'HEAD') {
-                    options.exists(id, version, function (exists) {
+                    options.exists(pkg, client, function (exists) {
                         res.send(exists ? 200 : 404);
                     });
 
                 } else if (req.method == 'GET') {
-                    options.fetch(id, version, function (result) {
+                    options.fetch(pkg, client, function (result) {
                         var error = false;
                         if (!result) {
                             res.send(404);
@@ -55,7 +99,7 @@ module.exports = exports = {
                             error = true;
                         }
 
-                        if (error) next(new Error('kpr: unsupported result given for fetch: ' + id + '@' + version));
+                        if (error) next(new Error('kpr: unsupported result given for fetch: ' + pkg.toString()));
                     });
 
                 } else next();
@@ -66,8 +110,57 @@ module.exports = exports = {
 
 
     owner: function (options) {
+        var basePath = '/o/';
+        if (!isFunction(options.add)) {
+            throw new Error('add handler must be a function');
+        } else if (!isFunction(options.list)) {
+            throw new Error('list handler must be a function');
+        } else if (!isFunction(options.remove)) {
+            throw new Error('remove handler must be a function');
+        }
+
         return function (req, res, next) {
-            next();
+            var client = new Client(req);
+            var pkg = Package.fromPath(req.path, basePath.length, true);
+            if (req.path.indexOf(basePath) === 0) {
+                if (req.method == 'GET') {
+                    options.list(pkg, client, function (result) {
+                        res.send(200, result || []);
+                    });
+                } else {
+                    var user = req.body.user;
+                    if (!user || !user.length) {
+                        res.send(400);
+                    } else {
+                        keyVerifier(client, function(verified) {
+                            if(verified) {
+                                if(req.method == 'DELETE') {
+                                    options.remove(pkg, client, user, function (result) {
+                                        res.send(result ? 204 : 404);
+                                    });                                
+                                }else if (req.method == 'POST') {
+                                    options.remove(pkg, client, user, function (result) {
+                                        res.send(result ? 204 : 404);
+                                    });
+                                }   
+                            } else {
+                                res.send(403);
+                            }
+                        });
+                    }
+                }
+            } else {
+                next();
+            }
         };
+    },
+
+
+    verifyKey: function (handler) {
+        if (!handler || typeof handler !== 'function') {
+            throw new Error('handler must be a function');
+        }
+
+        keyVerifier = handler;
     }
 };
