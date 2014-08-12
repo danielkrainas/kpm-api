@@ -120,9 +120,14 @@ module.exports = exports = {
         }
 
         return function (req, res, next) {
-            var client = new Client(req);
-            var pkg = Package.fromPath(req.path, basePath.length, true);
             if (req.path.indexOf(basePath) === 0) {
+                var client = new Client(req);
+                var pkg = Package.fromPath(req.path, basePath.length, false);
+                if (!pkg.id) {
+                    res.send(404);
+                    return;
+                }
+
                 if (req.method == 'GET') {
                     options.list(pkg, client, function (result) {
                         res.send(200, result || []);
@@ -132,17 +137,17 @@ module.exports = exports = {
                     if (!user || !user.length) {
                         res.send(400);
                     } else {
-                        keyVerifier(client, function(verified) {
-                            if(verified) {
-                                if(req.method == 'DELETE') {
-                                    options.remove(pkg, client, user, function (result) {
-                                        res.send(result ? 204 : 404);
-                                    });                                
-                                }else if (req.method == 'POST') {
+                        keyVerifier(client, function (verified) {
+                            if (verified) {
+                                if (req.method == 'DELETE') {
                                     options.remove(pkg, client, user, function (result) {
                                         res.send(result ? 204 : 404);
                                     });
-                                }   
+                                } else if (req.method == 'POST') {
+                                    options.remove(pkg, client, user, function (result) {
+                                        res.send(result ? 204 : 404);
+                                    });
+                                }
                             } else {
                                 res.send(403);
                             }

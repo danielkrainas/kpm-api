@@ -5,9 +5,9 @@ var chai = require('chai'),
 describe('Owner API:', function () {
     var options, req, res;
 
-    var apiWrapper = function(options) {
+    var apiWrapper = function(o) {
         return function() {
-            ownerApi(options);
+            ownerApi(o);
         };
     };
 
@@ -26,8 +26,7 @@ describe('Owner API:', function () {
                 method: 'GET',
                 get: function() {
                     return null;
-                },
-                query: {}
+                }
             };
 
             res = {
@@ -105,14 +104,17 @@ describe('Owner API:', function () {
     });
 
     describe('List Handler:', function() {
+        var key = '123',
+            basePath = '/o/';
         beforeEach(function() {
             req = {
-                path: '/o/',
+                path: '/o/foo/1.0',
                 method: 'GET',
-                get: function() {
-                    return null;
-                },
-                query: {}
+                get: function(h) {
+                    if(h == 'x-kpm-key') {
+                        return key;
+                    }
+                }
             };
             
             res = {
@@ -121,7 +123,27 @@ describe('Owner API:', function () {
         });
 
         it('should return empty list when result is null', function(done) {
-            done();
+            options.list = function(pkg, client, callback) {
+                callback(null);
+            };
+
+            res.send = function(status, data) {
+                expect(status).to.equal(200);
+                expect(data).to.have.length(0);
+                done();
+            };
+
+            ownerApi(options)(req, res, null);
+        });
+
+        it('should return 404 if the package id is null', function(done) {
+            req.path = basePath;
+            res.send = function(status) {
+                expect(status).to.equal(404);
+                done();
+            };
+
+            ownerApi(options)(req, res, null);
         });
     });
 });
