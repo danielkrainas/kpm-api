@@ -28,6 +28,9 @@ describe('Package API:', function() {
             req = {
                 path: '/',
                 method: 'GET',
+                get: function() {
+                    return null;
+                },
                 query: {}
             };
             
@@ -109,6 +112,9 @@ describe('Package API:', function() {
             req = {
                 path: '/p',
                 method: 'GET',
+                get: function() {
+                    return null;
+                },
                 query: {}
             };
             
@@ -185,10 +191,12 @@ describe('Package API:', function() {
         util.inherits(TestStream, Readable);
         beforeEach(function() {
             req = {
-                path: '/p/foo',
+                path: '/p/foo/1.0.0',
                 basePath: '/p/',
                 method: 'GET',
-                query: {}
+                get: function() {
+                    return null;
+                }
             };
             
             res = {
@@ -200,8 +208,8 @@ describe('Package API:', function() {
         });
         
         it('should recognize id', function(done) {
-            options.fetch = function(id) {
-                expect(id).to.equal('foo');
+            options.fetch = function(pkg) {
+                expect(pkg.id).to.equal('foo');
                 done();
             };
             
@@ -209,9 +217,9 @@ describe('Package API:', function() {
         });
         
         it('should recognize id with hyphen', function(done) {
-            req.path = req.basePath + 'foo-bar';
-            options.fetch = function(id) {
-                expect(id).to.equal('foo-bar');
+            req.path = req.basePath + 'foo-bar/1.0.0';
+            options.fetch = function(pkg) {
+                expect(pkg.id).to.equal('foo-bar');
                 done();
             };
             
@@ -219,9 +227,8 @@ describe('Package API:', function() {
         });
         
         it('should recognize version', function(done) {
-            req.query.v = '1.0.0';
-            options.fetch = function(id, version) {
-                expect(version).to.equal('1.0.0');
+            options.fetch = function(pkg) {
+                expect(pkg.version).to.equal('1.0.0');
                 done();
             };
             
@@ -229,8 +236,9 @@ describe('Package API:', function() {
         });
         
         it('should default version to an empty string when not specified', function(done) {
-            options.fetch = function(id, version) {
-                expect(version).to.be.empty;
+            req.path = req.basePath + 'foo';
+            options.fetch = function(pkg) {
+                expect(pkg.version).to.be.empty;
                 done();
             };
             
@@ -248,7 +256,7 @@ describe('Package API:', function() {
         });
         
         it('should return 404 if result is null', function(done) {
-            options.fetch = function(id, version, callback) {
+            options.fetch = function(pkg, client, callback) {
                 callback(null);
             };
             
@@ -262,7 +270,7 @@ describe('Package API:', function() {
         
         it('should allow buffer result', function(done) {
             var buffer = new Buffer(0);
-            options.fetch = function(id, version, callback) {
+            options.fetch = function(pkg, client, callback) {
                 callback(buffer);
             };
             
@@ -276,7 +284,7 @@ describe('Package API:', function() {
 
         it('should allow stream result', function(done) {
             res.status = function() {};
-            options.fetch = function(id, version, callback) {
+            options.fetch = function(pkg, client, callback) {
                 callback(stream);
             };
             
@@ -290,7 +298,7 @@ describe('Package API:', function() {
 
         it('should allow string result', function(done) {
             var dest = 'http://tempuri.org/foo';
-            options.fetch = function(id, version, callback) {
+            options.fetch = function(pkg, client, callback) {
                 callback(dest);
             };
 
@@ -304,7 +312,7 @@ describe('Package API:', function() {
 
         it('should return 302 when result is a string', function(done) {
             var dest = 'http://tempuri.org/foo';
-            options.fetch = function(id, version, callback) {
+            options.fetch = function(pkg, client, callback) {
                 callback(dest);
             };
 
@@ -317,7 +325,7 @@ describe('Package API:', function() {
         });
 
         it('should return 200 when result is a stream', function(done) {
-            options.fetch = function(id, version, callback) {
+            options.fetch = function(pkg, client, callback) {
                 callback(stream);
             };
             
@@ -330,7 +338,7 @@ describe('Package API:', function() {
         });
         
         it('should pass error if result not recognized', function(done) {
-            options.fetch = function(id, version, callback) {
+            options.fetch = function(pkg, client, callback) {
                 callback([]);
             };
             
@@ -342,7 +350,7 @@ describe('Package API:', function() {
         
         it('should respond 404 if package doesnt exist', function(done) {
             req.method = 'HEAD';
-            options.exists = function(id, version, callback) {
+            options.exists = function(pkg, client, callback) {
                 callback(false);
             };
             
@@ -356,7 +364,7 @@ describe('Package API:', function() {
         
         it('should respond 200 if package exists', function(done) {
             req.method = 'HEAD';
-            options.exists = function(id, version, callback) {
+            options.exists = function(pkg, client, callback) {
                 callback(true);
             };
             
