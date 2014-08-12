@@ -8,7 +8,7 @@ Install through `npm` like so:
 
 `npm install kpm-api --save`
 
-## Usage
+## Package Usage
 
 **Example:**
 
@@ -17,7 +17,7 @@ var express = require('express'),
 	kpmApi = require('kpm-api'),
 	app = express();
 
-app.use(kpmApi({
+app.use(kpmApi.packages({
     list: function(page, size, callback) {
         // code to retrieve a list of available packages.
 		// pass result to callback when done.
@@ -37,6 +37,26 @@ app.use(kpmApi({
 		callback(false);
     }
 });
+```
+
+## Owner API Usage
+
+**Example**
+
+```js
+app.use(kpmApi.owner({
+    add: function(client, name, callback) {
+        
+    },
+
+    remove: function(client, name, callback) {
+        
+    },
+
+    list: function(client, callback) {
+        
+    }
+}));
 ```
 
 ## Options

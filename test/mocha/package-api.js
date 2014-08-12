@@ -3,14 +3,15 @@ var sinon = require('sinon'),
        Readable = require('stream').Readable,
        util = require('util'),
        expect = chai.expect,
-       kpmApi = require('../../index');
+       packageApi = require('../../index'),
+       packageApi = packageApi.packages;
 
-describe('API:', function() {
+describe('Package API:', function() {
     var options, req, res, next;
     
-    var kpmApiWrapper = function(options) {
+    var apiWrapper = function(options) {
         return function() {
-            kpmApi(options);
+            packageApi(options);
         };
     };
 
@@ -36,7 +37,7 @@ describe('API:', function() {
         });
         
         it('should return middleware', function() {
-            var ware = kpmApi(options);
+            var ware = packageApi(options);
             expect(ware).to.exist;
             expect(ware).to.be.a('function');
             expect(ware.length).to.equal(3);
@@ -44,7 +45,7 @@ describe('API:', function() {
         
         it('should passthrough if unrecognized path', function(done) {
             req.path = '/foo/';
-            kpmApi(options)(req, res, function() {
+            packageApi(options)(req, res, function() {
                 done();
             });
         });
@@ -54,52 +55,52 @@ describe('API:', function() {
         it('should require list handler', function() {
             options.list = null;
 
-            expect(kpmApiWrapper(options)).to.throw();
+            expect(apiWrapper(options)).to.throw();
         });
         
         it('should require fetch handler', function() {
             options.fetch = null;
             
-            expect(kpmApiWrapper(options)).to.throw();
+            expect(apiWrapper(options)).to.throw();
         });
         
         it('should require exists handler', function() {
             options.exists = null;
             
-            expect(kpmApiWrapper(options)).to.throw();
+            expect(apiWrapper(options)).to.throw();
         });
         
         it('should require list to be a function', function() {
             options.list = 'list';
-            expect(kpmApiWrapper(options)).to.throw();
+            expect(apiWrapper(options)).to.throw();
             
             options.list = 1;
-            expect(kpmApiWrapper(options)).to.throw();
+            expect(apiWrapper(options)).to.throw();
             
             options.list = [1,2];
-            expect(kpmApiWrapper(options)).to.throw();
+            expect(apiWrapper(options)).to.throw();
         });
         
         it('should require fetch to be a function', function() {
             options.fetch = 'fetch';
-            expect(kpmApiWrapper(options)).to.throw();
+            expect(apiWrapper(options)).to.throw();
             
             options.fetch = 1;
-            expect(kpmApiWrapper(options)).to.throw();
+            expect(apiWrapper(options)).to.throw();
             
             options.fetch = [1,2];
-            expect(kpmApiWrapper(options)).to.throw();
+            expect(apiWrapper(options)).to.throw();
         });
         
         it('should require exists to be a function', function() {
             options.exists = 'exists';
-            expect(kpmApiWrapper(options)).to.throw();
+            expect(apiWrapper(options)).to.throw();
             
             options.exists = 1;
-            expect(kpmApiWrapper(options)).to.throw();
+            expect(apiWrapper(options)).to.throw();
             
             options.exists = [1,2];
-            expect(kpmApiWrapper(options)).to.throw();
+            expect(apiWrapper(options)).to.throw();
         });
     });
     
@@ -122,7 +123,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
         
         it('should default page size to -1 when not specified', function(done) {
@@ -131,7 +132,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
         
         it('should return empty list when result is null', function(done) {
@@ -145,13 +146,13 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
         
         it('should passthrough if not a GET request', function(done) {
             req.method = 'PUT';
             
-            kpmApi(options)(req, res, function() {
+            packageApi(options)(req, res, function() {
                 done();
             });
         });
@@ -163,7 +164,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
         
         it('should recognize page size when specified', function(done) {
@@ -173,7 +174,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
     });
     
@@ -204,7 +205,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
         
         it('should recognize id with hyphen', function(done) {
@@ -214,7 +215,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
         
         it('should recognize version', function(done) {
@@ -224,7 +225,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
         
         it('should default version to an empty string when not specified', function(done) {
@@ -233,7 +234,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
         
         it('should return 404 if id is null', function(done) {
@@ -243,7 +244,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
         
         it('should return 404 if result is null', function(done) {
@@ -256,7 +257,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
         
         it('should allow buffer result', function(done) {
@@ -270,7 +271,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
 
         it('should allow stream result', function(done) {
@@ -284,7 +285,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
 
         it('should allow string result', function(done) {
@@ -298,7 +299,7 @@ describe('API:', function() {
                 done();
             };
 
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
 
         it('should return 302 when result is a string', function(done) {
@@ -312,7 +313,7 @@ describe('API:', function() {
                 done();
             };
 
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
 
         it('should return 200 when result is a stream', function(done) {
@@ -325,7 +326,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
         
         it('should pass error if result not recognized', function(done) {
@@ -333,7 +334,7 @@ describe('API:', function() {
                 callback([]);
             };
             
-            kpmApi(options)(req, res, function(msg) {
+            packageApi(options)(req, res, function(msg) {
                 expect(msg).not.be.null;
                 done();
             });
@@ -350,7 +351,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
         
         it('should respond 200 if package exists', function(done) {
@@ -364,7 +365,7 @@ describe('API:', function() {
                 done();
             };
             
-            kpmApi(options)(req, res, next);
+            packageApi(options)(req, res, next);
         });
     });
 });
