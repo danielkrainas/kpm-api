@@ -1,6 +1,14 @@
 var stream = require('stream');
 
-var keyVerifier = null;
+var privateVerifier = null;
+
+var keyVerifier = function (client, callback) {
+    if (!privateVerifier) {
+        throw new Error('no key verifier was provided.');
+    }
+
+    privateVerifier(client, callback);
+};
 
 var isFunction = function (fn) {
     return (fn && typeof fn === 'function');
@@ -170,6 +178,6 @@ module.exports = exports = {
             throw new Error('handler must be a function');
         }
 
-        keyVerifier = handler;
+        privateVerifier = handler;
     }
 };
