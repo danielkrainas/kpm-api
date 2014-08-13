@@ -1,4 +1,5 @@
 var stream = require('stream'),
+    fs = require('fs'),
     extend = require('extend');
 
 var privateVerifier = null;
@@ -7,6 +8,14 @@ var defaultConfigOptions = {
     packages: '/p',
     publishing: false,
     owner: false
+};
+
+var defaultUploadResolver = function(req, name) {
+    if(!name || !req.files || !req.files[name]) {
+        return name;
+    }
+
+    return fs.createReadStream(req.files[name].path);
 };
 
 var keyVerifier = function (client, callback) {
@@ -203,10 +212,52 @@ module.exports = exports = {
             throw new Error('publish handler must be a function');
         } else if (options.unpublish && !isFunction(options.unpublish)) {
             throw new Error('unpublish handler must be a function');
+        } else if (options.uploadResolver && !isFunction(options.streamResolver)) {
+            throw new Error('uploadResolver handler must be a function');
         }
 
+        options.uploadResolver = options.uploadResolver || defaultUploadResolver;
         return function (req, res, next) {
-            next();
+            if (req.path.indexOf(basePath) === 0) {
+                if (req.method == 'PUT' || req.method == 'DELETE') {
+                    var client = new Client(req);
+                    var pkg = Package.fromPath(req.path, basePath.length, true);
+                    if (!pkg.id) {
+                        res.send(404);
+                    }
+
+                    keyVerifier(client, function (verified) {
+                        if (!verified) {
+                            res.send(403);
+                        } else {
+                            if (req.method == 'PUT') {
+                                var stream = options.uploadResolver(req, 'package');
+                                if (!stream) {
+                                    res.send(400);
+                                }
+
+                                if (!(stream instanceof stream.Readable)) {
+                                    next(new Error('non-readable stream returned from the upload resolver'));
+                                }
+
+                                options.publish(pkg, client, stream, function (result) {
+                                    res.send(result ? 201 : 400);
+                                });
+                            } else if (options.unpublish) { // DELETE
+                                options.unpublish(pkg, client, function (result) {
+                                    res.send(result ? 200 : 400);
+                                });
+                            } else {
+                                res.send(404);
+                            }
+                        }
+                    });
+                } else {
+                    next();
+                }
+            } else {
+                next();
+            }
         };
     },
 
