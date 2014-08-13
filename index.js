@@ -26,7 +26,7 @@ Package.fromPath = function (path, start, hasVersion) {
         end = null;
     }
 
-    pkg.id = path.substring(0, end);
+    pkg.id = end ? path.substring(0, end) : path;
     if (end && hasVersion) {
         pkg.version = path.substring(end + 1);
     } else {
@@ -44,7 +44,9 @@ module.exports = exports = {
 
     Package: Package,
 
+
     Client: Client,
+
 
     packages: function (options) {
         var listPath = '/p';
@@ -136,7 +138,7 @@ module.exports = exports = {
                     var user = req.body.user;
                     if (!user || !user.length) {
                         res.send(400);
-                    } else {
+                    } else if (req.method == 'DELETE' || req.method == 'POST') {
                         keyVerifier(client, function (verified) {
                             if (verified) {
                                 if (req.method == 'DELETE') {
@@ -144,7 +146,7 @@ module.exports = exports = {
                                         res.send(result ? 204 : 404);
                                     });
                                 } else if (req.method == 'POST') {
-                                    options.remove(pkg, client, user, function (result) {
+                                    options.add(pkg, client, user, function (result) {
                                         res.send(result ? 204 : 404);
                                     });
                                 }
@@ -152,6 +154,8 @@ module.exports = exports = {
                                 res.send(403);
                             }
                         });
+                    } else {
+                        next();
                     }
                 }
             } else {
