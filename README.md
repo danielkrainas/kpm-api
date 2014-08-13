@@ -8,6 +8,18 @@ Install through `npm` like so:
 
 `npm install kpm-api --save`
 
+## Configuration
+
+**Example:**
+
+```js
+app.use(kpm.config({
+    packages: '/p',
+    owner: false,
+    publishing: false
+}));
+```
+
 ## API Key Verification
 
 **Example:**

@@ -13,24 +13,23 @@ describe('Config:', function () {
     };
 
     beforeEach(function () {
-        options = {};
+        options = {
+            packages: true,
+            owner: true,
+            publishing: true
+        };
+
+        req = {
+            path: basePath,
+            method: 'GET'
+        };
+
+        res = {
+            send: function () { }
+        };
     });
 
     describe('Basics', function () {
-        beforeEach(function () {
-            req = {
-                path: basePath,
-                method: 'GET',
-                get: function() {
-                    return null;
-                }
-            };
-
-            res = {
-                send: function () { }
-            };
-        });
-
         it('should return middleware', function () {
             var ware = config(options);
             expect(ware).to.exist;
@@ -43,6 +42,21 @@ describe('Config:', function () {
             config(options)(req, res, function () {
                 done();
             });
+        });
+    });
+
+    describe('Options', function () {
+
+        it('should use defaults when not supplied', function (done) {
+            res.send = function(status, data) {
+                expect(status).to.equal(200);
+                expect(data.packages).to.exist;
+                expect(data.publishing).to.exist;
+                expect(data.owner).to.exist;
+                done();
+            };
+
+            config({})(req, res, null);
         });
     });
 });

@@ -1,6 +1,13 @@
-var stream = require('stream');
+var stream = require('stream'),
+    extend = require('extend');
 
 var privateVerifier = null;
+
+var defaultConfigOptions = {
+    packages: '/p',
+    publishing: false,
+    owner: false
+};
 
 var keyVerifier = function (client, callback) {
     if (!privateVerifier) {
@@ -57,8 +64,18 @@ module.exports = exports = {
 
 
     config: function (options) {
+        options = extend({}, defaultConfigOptions, options);
+
         return function (req, res, next) {
-            next();
+            if (req.path == '/kpm-config.json') {
+                res.send(200, {
+                    packages: options.packages,
+                    publishing: options.publishing,
+                    owner: options.owner
+                });
+            } else {
+                next();
+            }
         };
     },
 
