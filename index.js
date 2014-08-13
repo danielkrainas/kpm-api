@@ -56,6 +56,13 @@ module.exports = exports = {
     Client: Client,
 
 
+    config: function (options) {
+        return function (req, res, next) {
+            next();
+        };
+    },
+
+
     packages: function (options) {
         var listPath = '/p';
         var packagesPath = '/p/';
