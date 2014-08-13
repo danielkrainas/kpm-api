@@ -104,7 +104,7 @@ describe('Owner API:', function () {
         });
     });
 
-    describe('List Handler:', function() {
+    describe('List Handler', function() {
         var verified = true;
 
         beforeEach(function() {
