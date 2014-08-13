@@ -69,6 +69,22 @@ app.use(kpmApi.owner({
 }));
 ```
 
+## Publishing API Usage
+
+**Example**
+
+```js
+app.use(kpmApi.publishing({
+    publish: function (pkg, stream, client, callback) {
+
+    },
+
+    unpublish: function (pkg, client, callback) {
+
+    }
+}));
+```
+
 ## Options
 
 **list** (required) - A handler for listing available packages in the repository. Takes an index for the page requested(`page`), the page size(`size`), and a callback(`callback`) for returning the result. 

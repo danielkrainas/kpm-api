@@ -173,6 +173,20 @@ module.exports = exports = {
     },
 
 
+    publishing: function (options) {
+        var basePath = '/p/';
+        if (!isFunction(options.publish)) {
+            throw new Error('publish handler must be a function');
+        } else if (options.unpublish && !isFunction(options.unpublish)) {
+            throw new Error('unpublish handler must be a function');
+        }
+
+        return function (req, res, next) {
+            next();
+        };
+    },
+
+
     verifyKey: function (handler) {
         if (!handler || typeof handler !== 'function') {
             throw new Error('handler must be a function');
