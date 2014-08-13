@@ -256,4 +256,109 @@ describe('Owner API:', function () {
             });
         });
     });
+
+    describe('Remove Handler', function() {
+        var verified = true;
+
+        beforeEach(function() {
+            req = {
+                path: '/o/foo',
+                method: 'DELETE',
+                body: {
+                    user: 'foo'
+                },
+                get: function(h) {
+                    if(h == 'x-kpm-key') {
+                        return '123';
+                    }
+                }
+            };
+            
+            res = {
+                send: function() {}
+            };
+
+            kpm.verifyKey(function(client, callback) {
+                callback(verified);
+            });
+
+            verified = true;
+        });
+
+        it('should return 404 if package id is null', function(done) {
+            req.path = basePath;
+            res.send = function(status) {
+                expect(status).to.equal(404);
+                done();
+            };
+
+            ownerApi(options)(req, res, null);            
+        });
+
+        it('should return 404 if result is null', function(done) {
+            options.remove = function(pkg, client, user, callback) {
+                callback(null);
+            };
+
+            res.send = function(status) {
+                expect(status).to.equal(404);
+                done();
+            };
+
+            ownerApi(options)(req, res, null);
+        });
+
+        it('should return 404 if result is false', function(done) {
+            options.remove = function(pkg, client, user, callback) {
+                callback(false);
+            };
+
+            res.send = function(status) {
+                expect(status).to.equal(404);
+                done();
+            };
+
+            ownerApi(options)(req, res, null);
+        });
+
+        it('should return 204 if result is truthy', function(done) {
+            options.remove = function(pkg, client, user, callback) {
+                callback(1);
+            };
+
+            res.send = function(status) {
+                expect(status).to.equal(204);
+                done();
+            };
+
+            ownerApi(options)(req, res, null);
+        });
+
+        it('should return 403 if key is not verified', function(done) {
+            verified = false;
+            res.send = function(status) {
+                expect(status).to.equal(403);
+                done();
+            };
+
+            ownerApi(options)(req, res, null);
+        });
+
+        it('should return 400 if user is not supplied', function(done) {
+            req.body.user = null;
+            res.send = function(status) {
+                expect(status).to.equal(400);
+                done();
+            };
+
+            ownerApi(options)(req, res, null);
+        });
+
+        it('should passthrough if request is not a DELETE', function(done) {
+            req.method = 'PUT';
+            ownerApi(options)(req, res, function() {
+                done();
+            });
+        });
+    });
 });
