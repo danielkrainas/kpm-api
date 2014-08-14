@@ -212,7 +212,7 @@ module.exports = exports = {
             throw new Error('publish handler must be a function');
         } else if (options.unpublish && !isFunction(options.unpublish)) {
             throw new Error('unpublish handler must be a function');
-        } else if (options.uploadResolver && !isFunction(options.streamResolver)) {
+        } else if (options.uploadResolver && !isFunction(options.uploadResolver)) {
             throw new Error('uploadResolver handler must be a function');
         }
 
@@ -231,16 +231,16 @@ module.exports = exports = {
                             res.send(403);
                         } else {
                             if (req.method == 'PUT') {
-                                var stream = options.uploadResolver(req, 'package');
-                                if (!stream) {
+                                var upload = options.uploadResolver(req, 'package');
+                                if (!upload) {
                                     res.send(400);
                                 }
 
-                                if (!(stream instanceof stream.Readable)) {
+                                if (!(upload instanceof stream.Readable)) {
                                     next(new Error('non-readable stream returned from the upload resolver'));
                                 }
 
-                                options.publish(pkg, client, stream, function (result) {
+                                options.publish(pkg, client, upload, function (result) {
                                     res.send(result ? 201 : 400);
                                 });
                             } else if (options.unpublish) { // DELETE
@@ -248,7 +248,7 @@ module.exports = exports = {
                                     res.send(result ? 200 : 400);
                                 });
                             } else {
-                                res.send(404);
+                                res.send(405);
                             }
                         }
                     });

@@ -3,8 +3,8 @@ var sinon = require('sinon'),
        Readable = require('stream').Readable,
        util = require('util'),
        expect = chai.expect,
-       packageApi = require('../../index'),
-       packageApi = packageApi.packages;
+       kpm = require('../../index'),
+       packageApi = kpm.packages;
 
 describe('Package API:', function() {
     var options, req, res, next;
