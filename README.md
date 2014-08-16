@@ -14,9 +14,11 @@ Install through `npm` like so:
 
 `npm install kpm-api --save`
 
-## Configuration
+## API Configuration File
 
-**Example:**
+If you wish to host your API endpoints on paths different from the default or wish to only implement certain API's, you can use the `config` middleware to make the clients aware. The middleware serves a file(`/kpm-config.json`) that is requested by the kpm client to determine the repository capabilities and conventions. 
+
+### Example
 
 ```js
 app.use(kpm.config({
@@ -26,26 +28,55 @@ app.use(kpm.config({
 }));
 ```
 
-## API Key Verification
+### Options
 
-**Example:**
+- **packages** - _packages_ API feature endpoint path. By default, the path is set to `/p`.
+
+- **owner** - _owner_ API feature endpoint path. By default, this feature is disabled.
+
+- **publishing** - _publishing_ API feature endpoint path. By default, this feature is disabled.
+
+**Note 1**: All paths are relative to the host. Absolute URI's are not allowed.
+ 
+**Note 2**: A `false` value indicates that feature is not available on this registry.
+
+## Key Verification
+
+The _owner_ and _publishing_ features require a handler to verify client requests. This handler can be specified using the `verifyKey` function.
+
+### Usage
 
 ```js
-kpmApi.verifyKey(function (key, callback) {
-    // verify key and pass the result to callback
+require('kpm-api').verifyKey(function (key, callback) { /* ... */ });
+```
+
+### Example
+
+```js
+var kpm = require('kpm-api');
+
+kpm.verifyKey(function (key, callback) {
+    // verify key provided
+	callback(true || false);
 });
 ```
 
-## Package API Usage
+### Parameters
 
-**Example:**
+**handler** - the handler will be passed a `key` and a `callback`. After verifying the key, the result should be passed to `callback` as a boolean (`true` or `false`).
+
+## Packages Feature
+
+This endpoint handles requests for retrieving and searching for packages. 
+
+### Example
 
 ```js
 var express = require('express'),
-	kpmApi = require('kpm-api'),
+	kpm = require('kpm-api'),
 	app = express();
 
-app.use(kpmApi.packages({
+app.use(kpm.packages({
     list: function (page, size, client, callback) {
         // code to retrieve a list of available packages.
 		// pass result to callback when done.
@@ -69,21 +100,21 @@ app.use(kpmApi.packages({
 
 ### Options
 
-**list** (required) - A handler for listing available packages in the repository. Takes an index for the page requested(`page`), the page size(`size`), the client object(`client`), and a callback(`callback`) for returning the result. 
+**list** - A handler for listing available packages in the repository. Takes an index for the page requested(`page`), the page size(`size`), the client object(`client`), and a callback(`callback`) for returning the result. 
 
 - `size` will be `-1` if not specified. This would mean paging is not active.
 - `callback` expects an `Array`.
 - `callback` will return an empty `Array` if the result is `null` or `undefined`.
 - `page` is zero-based.
 
-**fetch** (required) - a handler for retrieving a package. Takes a `pkg` object, `client` object, and a `callback` for returning the result.
+**fetch** - a handler for retrieving a package. Takes a `pkg` object, `client` object, and a `callback` for returning the result.
 
 - `callback` expects a readable `stream`, `Buffer`, or string.
 - a string result will cause a redirection to the url provided to the callback.
 - a `null` or `undefined` result means the package was not found and the server will respond with 404.
 - if the result is not a `stream` or `Buffer`, the middleware will pass an error to the next middleware.
 
-**exists** (required) - a handler for determining if a package is available within the repository. Like **fetch**, it takes a `pkg` object, `client` object, and `callback`.
+**exists** - a handler for determining if a package is available within the repository. Like **fetch**, it takes a `pkg` object, `client` object, and `callback`.
 
 - `callback` expects either `true` or `false`.
 
@@ -92,7 +123,11 @@ app.use(kpmApi.packages({
 **Example**
 
 ```js
-app.use(kpmApi.owner({
+var express = require('express'),
+	kpm = require('kpm-api'),
+	app = express();
+
+app.use(kpm.owner({
     add: function(pkg, client, name, callback) {
         
     },
@@ -109,21 +144,21 @@ app.use(kpmApi.owner({
 
 ### Options
 
-**add** (required) - A handler for listing available packages in the repository. Takes an index for the page requested(`page`), the page size(`size`), and a callback(`callback`) for returning the result. 
+**add** - A handler for listing available packages in the repository. Takes an index for the page requested(`page`), the page size(`size`), and a callback(`callback`) for returning the result. 
 
 - `size` will be `-1` if not specified. This would mean paging is not active.
 - `callback` expects an `Array`.
 - `callback` will return an empty `Array` if the result is `null` or `undefined`.
 - `page` is zero-based.
 
-**remove** (required) - a handler for retrieving a package. Takes a package `id`, `version`, and `callback` for returning the result.
+**remove** - a handler for retrieving a package. Takes a package `id`, `version`, and `callback` for returning the result.
 
 - `version` may be blank. This means the latest version available.
 - `callback` expects a readable `stream` or `Buffer`.
 - a `null` or `undefined` result means the package was not found and the server will respond with 404.
 - if the result is not a `stream` or `Buffer`, the middleware will pass an error to the next middleware.
 
-**list** (required) - a handler for determining if a package is available within the repository. Like **fetch**, it takes an `id`, `version`, and `callback`.
+**list** - a handler for determining if a package is available within the repository. Like **fetch**, it takes an `id`, `version`, and `callback`.
 
 - `version` may be blank. This means the latest version available.
 - `callback` expects either `true` or `false`.  
@@ -133,7 +168,11 @@ app.use(kpmApi.owner({
 **Example**
 
 ```js
-app.use(kpmApi.publishing({
+var express = require('express'),
+	kpm = require('kpm-api'),
+	app = express();
+
+app.use(kpm.publishing({
     publish: function (pkg, stream, client, callback) {
 
     },
@@ -150,21 +189,21 @@ app.use(kpmApi.publishing({
 
 ### Options
 
-**publish** (required) - A handler for listing available packages in the repository. Takes an index for the page requested(`page`), the page size(`size`), and a callback(`callback`) for returning the result. 
+**publish** - A handler for listing available packages in the repository. Takes a `pkg` object, `client` object, and a `callback` for returning the result.
 
 - `size` will be `-1` if not specified. This would mean paging is not active.
 - `callback` expects an `Array`.
 - `callback` will return an empty `Array` if the result is `null` or `undefined`.
 - `page` is zero-based.
 
-**unpublish** (required) - a handler for retrieving a package. Takes a package `id`, `version`, and `callback` for returning the result.
+**unpublish** (optional) - a handler for retrieving a package. Takes a package `id`, `version`, and `callback` for returning the result.
 
 - `version` may be blank. This means the latest version available.
 - `callback` expects a readable `stream` or `Buffer`.
 - a `null` or `undefined` result means the package was not found and the server will respond with 404.
 - if the result is not a `stream` or `Buffer`, the middleware will pass an error to the next middleware.
 
-**uploadResolver** - a handler for determining if a package is available within the repository. Like **fetch**, it takes an `id`, `version`, and `callback`.
+**uploadResolver** (optional)- a handler for determining if a package is available within the repository. Like **fetch**, it takes an `id`, `version`, and `callback`.
 
 - `version` may be blank. This means the latest version available.
 - `callback` expects either `true` or `false`.  
