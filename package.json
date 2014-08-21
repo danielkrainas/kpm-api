@@ -1,6 +1,6 @@
 {
   "name": "kpm-api",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Express middleware for implementing a KSP package repository according to the KPM communication spec.",
   "keywords": [
     "kpm",
